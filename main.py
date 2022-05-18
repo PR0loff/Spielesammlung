@@ -1,139 +1,142 @@
 import pygame
 import time
 import random
+from enum import Enum
  
 #start the engine
 pygame.init()
- 
-#define colors
-white = (255, 255, 255)
-black = (0, 0, 0)
-yellow = (255, 255, 102)
-red = (213, 50, 80)
-green = (0, 255, 0)
-blue = (50, 153, 213)
-
-#define windowsize 
-dis_width = 1200
-dis_height = 900
-dis = pygame.display.set_mode((dis_width, dis_height))
-
 pygame.display.set_caption('Spielesammlung')
  
+#define colors
+WHITE = (255, 255, 255)
+BLACK = (0, 0, 0)
+RED = (255, 0, 0)
+
+#define windowsize 
+windowWidth = 1200
+windowHeight = 900
+window = pygame.display.set_mode((windowWidth, windowHeight))
+
+
 #clock for ticks 
 clock = pygame.time.Clock()
 
 #size of blocks and speed of the snake
-snake_block = 10
 blocksize = 30
-snake_speed = 15
+ticktime = 15
  
-font_style = pygame.font.SysFont("bahnschrift", 25)
-score_font = pygame.font.SysFont("comicsansms", 35)
+#class for the last direction
+class Direction(Enum):
+    UP = 0
+    RIGHT = 1
+    DOWN = 2
+    LEFT = 3
 
-
-
- 
-def Your_score(score):
-    value = score_font.render("Your Score: " + str(score), True, yellow)
-    dis.blit(value, [0, 0])
-  
-def our_snake(snake_block, snake_list):
-    for x in snake_list:
-        pygame.draw.rect(dis, black, [x[0], x[1], snake_block, snake_block])
- 
- 
-def message(msg, color):
-    mesg = font_style.render(msg, True, color)
-    dis.blit(mesg, [dis_width / 6, dis_height / 3])
- 
- 
+#main function
 def gameLoop():
-    game_over = False
-    game_close = False
- 
-    x1 = dis_width / 2
-    y1 = dis_height / 2
- 
-    x1_change = 0
-    y1_change = 0
- 
-    snake_list = [pygame.Rect(x1, y1, blocksize, blocksize)]
- 
-    foodx = round(random.randrange(0, dis_width - blocksize) / blocksize) * blocksize
-    foody = round(random.randrange(0, dis_height - blocksize) / blocksize) * blocksize
+    #true when the window gets closed
+    close = False
+    #true when the game is over and the player can restart
+    restart = False
 
+    #current Direction
+    xVelocity = 0
+    yVelocity = 0
+    lastDirection = -1
+    
+    #the list containing all snake rectangles
+    snakeList = [pygame.Rect(windowWidth / 2,  windowHeight / 2, blocksize, blocksize)]
+    
+    #spawn food at random location
+    foodX = round(random.randrange(0, windowWidth - blocksize) / blocksize) * blocksize
+    foodY = round(random.randrange(0, windowHeight - blocksize) / blocksize) * blocksize
 
-    while not game_over:
- 
-        while game_close == True:
-            dis.fill(blue)
-            
-            message("You Lost! Press C-Play Again or Q-Quit", red)
-            #Your_score(Length_of_snake - 1)
+    while not close:
+        while restart == True:        
+            #Display postgame info
+            font = pygame.font.SysFont("comicsansms", 35)
+
+            text = font.render("Your score: " + str(len(snakeList)) + "!", True, WHITE)
+            text_rect = text.get_rect(center=(windowWidth / 2, windowHeight / 2 - 50))
+            window.blit(text, text_rect)
+
+            text = font.render("Press R to restart or Q to Quit", True, WHITE)
+            text_rect = text.get_rect(center=(windowWidth / 2, windowHeight / 2 + 50))
+            window.blit(text, text_rect)
+
             pygame.display.update()
- 
+
+            #handle Events
             for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    close = True
+                    restart = False
                 if event.type == pygame.KEYDOWN:
-                    if event.key == pygame.K_q or event.type == pygame.QUIT:
-                        game_over = True
-                        game_close = False
-                    if event.key == pygame.K_c:
+                    if event.key == pygame.K_r:
                         gameLoop()
-        
+                    if event.key == pygame.K_q:
+                        close = True
+                        restart = False
+
+        #handle Events
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                game_over = True
+                close = True
             if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_LEFT:
-                    x1_change = -blocksize
-                    y1_change = 0
-                elif event.key == pygame.K_RIGHT:
-                    x1_change = blocksize
-                    y1_change = 0
-                elif event.key == pygame.K_UP:
-                    y1_change = -blocksize
-                    x1_change = 0
-                elif event.key == pygame.K_DOWN:
-                    y1_change = blocksize
-                    x1_change = 0
+                if event.key == pygame.K_LEFT and lastDirection != Direction.RIGHT:
+                    xVelocity = -blocksize
+                    yVelocity = 0
+                    lastDirection = Direction.LEFT
+                elif event.key == pygame.K_RIGHT and lastDirection != Direction.LEFT:
+                    xVelocity = blocksize
+                    yVelocity = 0
+                    lastDirection = Direction.RIGHT
+                elif event.key == pygame.K_UP and lastDirection != Direction.DOWN:                 
+                    xVelocity = 0
+                    yVelocity = -blocksize
+                    lastDirection = Direction.UP
+                elif event.key == pygame.K_DOWN and lastDirection != Direction.UP:                  
+                    xVelocity = 0
+                    yVelocity = blocksize
+                    lastDirection = Direction.DOWN
 
-        #draw snake, food, background
-        for x in snake_list:
-            pygame.draw.rect(dis, white, x)
-        pygame.draw.rect(dis, green, [foodx, foody, blocksize, blocksize])
-        dis.fill(blue)
-        
+
         #clone the last snakepiece on top of the snakehead
-        snake_list.insert(0, pygame.Rect(snake_list[-1].x, snake_list[-1].y, blocksize, blocksize))
+        snakeList.insert(0, pygame.Rect(snakeList[-1].x, snakeList[-1].y, blocksize, blocksize))
         
         #move the cloned snakepiece according to input
-        snake_list[0].x = snake_list[1].x + x1_change
-        snake_list[0].y = snake_list[1].y + y1_change
+        snakeList[0].x = snakeList[1].x + xVelocity
+        snakeList[0].y = snakeList[1].y + yVelocity
 
         #collision with food
-        if snake_list[0].x == foodx and snake_list[0].y == foody:
+        if snakeList[0].x == foodX and snakeList[0].y == foodY:
             #yes: spawn new food
-            foodx = round(random.randrange(0, dis_width - blocksize) / blocksize) * blocksize
-            foody = round(random.randrange(0, dis_height - blocksize) / blocksize) * blocksize
+            foodX = round(random.randrange(0, windowWidth - blocksize) / blocksize) * blocksize
+            foodY = round(random.randrange(0, windowHeight - blocksize) / blocksize) * blocksize
         else:
             #no: delete the last snakepiece because its the new snakehead
-            del snake_list[-1]
+            del snakeList[-1]
 
         #collision with boarders
-        if snake_list[0].x >= dis_width or snake_list[0].x < 0 or snake_list[0].y >= dis_height or snake_list[0].y < 0:
-            game_close = True
+        if snakeList[0].x >= windowWidth or snakeList[0].x < 0 or snakeList[0].y >= windowHeight or snakeList[0].y < 0:
+            restart = True
 
         #collision with own body
-        for x in snake_list[1:]:
-            if (snake_list[0].x == x.x and snake_list[0].y == x.y):
-                game_close = True
+        for x in snakeList[1:]:
+            if (snakeList[0].x == x.x and snakeList[0].y == x.y):
+                restart = True
+
+        #draw snake, food, background
+        window.fill(BLACK)    
+        for x in snakeList:
+            pygame.draw.rect(window, WHITE, x)
+        pygame.draw.rect(window, RED, [foodX, foodY, blocksize, blocksize])       
 
         #update display
         pygame.display.update()
         
         #set speed/framerate
-        clock.tick(snake_speed)
+        clock.tick(ticktime)
 
     pygame.quit()
     quit()
