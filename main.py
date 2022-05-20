@@ -82,23 +82,28 @@ def gameLoop():
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 close = True
+            #movement: only allow one input per game tick
             if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_LEFT and lastDirection != Direction.RIGHT:
+                if (event.key == pygame.K_LEFT or event.key == pygame.K_a) and lastDirection != Direction.RIGHT:
                     xVelocity = -blocksize
                     yVelocity = 0
                     lastDirection = Direction.LEFT
-                elif event.key == pygame.K_RIGHT and lastDirection != Direction.LEFT:
+                    break
+                elif (event.key == pygame.K_RIGHT or event.key == pygame.K_d) and lastDirection != Direction.LEFT:
                     xVelocity = blocksize
                     yVelocity = 0
                     lastDirection = Direction.RIGHT
-                elif event.key == pygame.K_UP and lastDirection != Direction.DOWN:                 
+                    break
+                elif (event.key == pygame.K_UP or event.key == pygame.K_w) and lastDirection != Direction.DOWN:                 
                     xVelocity = 0
                     yVelocity = -blocksize
                     lastDirection = Direction.UP
-                elif event.key == pygame.K_DOWN and lastDirection != Direction.UP:                  
+                    break
+                elif (event.key == pygame.K_DOWN or event.key == pygame.K_s) and lastDirection != Direction.UP:                  
                     xVelocity = 0
                     yVelocity = blocksize
                     lastDirection = Direction.DOWN
+                    break   
 
 
         #clone the last snakepiece on top of the snakehead
@@ -111,8 +116,16 @@ def gameLoop():
         #collision with food
         if snakeList[0].x == foodX and snakeList[0].y == foodY:
             #yes: spawn new food
-            foodX = round(random.randrange(0, windowWidth - blocksize) / blocksize) * blocksize
-            foodY = round(random.randrange(0, windowHeight - blocksize) / blocksize) * blocksize
+            while(True):
+                spawnInsideSnake = False
+                foodX = round(random.randrange(0, windowWidth - blocksize) / blocksize) * blocksize
+                foodY = round(random.randrange(0, windowHeight - blocksize) / blocksize) * blocksize
+                for x in snakeList:
+                    if (x.x == foodX and x.y == foodY):
+                        spawnInsideSnake = True
+                        break
+                if (not spawnInsideSnake):
+                    break
         else:
             #no: delete the last snakepiece because its the new snakehead
             del snakeList[-1]
