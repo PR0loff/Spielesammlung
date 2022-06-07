@@ -49,6 +49,7 @@ ballspeed = 10
 ballIncreasment = 1.10
 paddleSpeed = 8
 
+seed(time.time)
 
 def gameLoop():
     #true when the window gets closed
@@ -63,15 +64,13 @@ def gameLoop():
     p2Vel = 0
 
     #define ball
-    seed(time.time)
-
     xBallVelocity = randint(-10,10)
-    yBallVelocity = randint(-10,10)
+    yBallVelocity = randint(-5,5)
     while xBallVelocity == 0:
         xBallVelocity = randint(-10,10)
 
     while yBallVelocity == 0:
-        yBallVelocity = randint(-10,10)
+        yBallVelocity = randint(-5,5)
 
     yBallPosition = windowHeight/2
     xBallPosition = windowWidth/2
@@ -217,4 +216,3 @@ def gameLoop():
     pygame.quit()
     quit()
  
-gameLoop()
