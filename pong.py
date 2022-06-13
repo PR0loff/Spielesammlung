@@ -181,11 +181,14 @@ def gameLoop():
                 restart = True
             if(yBallPosition < p2.yPosition+50):
                 xBallVelocity = -xBallVelocity*ballIncreasment
+                xBallPosition -= 5
                 yBallVelocity -= 1
             elif(p2.yPosition+50<=yBallPosition and yBallPosition < p2.yPosition+100):
                 xBallVelocity = -xBallVelocity*ballIncreasment
+                xBallPosition -= 5
             elif(p2.yPosition+100<=yBallPosition):
                 xBallVelocity = -xBallVelocity*ballIncreasment
+                xBallPosition -= 5
                 yBallVelocity += 1
 
 
@@ -194,12 +197,15 @@ def gameLoop():
                 restart = True
             if(yBallPosition < p1.yPosition+50):
                 xBallVelocity = -xBallVelocity*ballIncreasment
+                xBallPosition += 5
                 yBallVelocity -= 1
             elif(p1.yPosition+50<=yBallPosition and yBallPosition < p1.yPosition+100):
                 xBallVelocity = -xBallVelocity*ballIncreasment
+                xBallPosition += 5
             elif(p1.yPosition+100<=yBallPosition):
                 xBallVelocity = -xBallVelocity*ballIncreasment
                 yBallVelocity += 1
+                xBallPosition += 5
 
 
         #draw paddles, ball, background
