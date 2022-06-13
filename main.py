@@ -17,9 +17,7 @@ windowHeight = 900
 window = pygame.display.set_mode((windowWidth, windowHeight))
 
 
-#main function
-def mainLoop():
-
+def initalize():
     font = pygame.font.SysFont("comicsansms", 35)
     text = font.render("Press S to play Snake", True, WHITE)
     text_rect = text.get_rect(center=(windowWidth / 2, windowHeight / 2 - 100))
@@ -33,6 +31,11 @@ def mainLoop():
     text_rect = text.get_rect(center=(windowWidth / 2, windowHeight / 2 + 150))
     window.blit(text, text_rect)
 
+
+#main function
+def mainLoop():
+
+    initalize()
     close = False
 
     while not close:
@@ -42,8 +45,10 @@ def mainLoop():
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_p:
                         pong.gameLoop()
+                        initalize()
                     if event.key == pygame.K_s:
                         snake.gameLoop()
+                        initalize()
             
         #update display
         pygame.display.update()

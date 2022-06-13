@@ -87,7 +87,7 @@ def gameLoop():
             text_rect = text.get_rect(center=(windowWidth / 2, windowHeight / 2 - 50))
             window.blit(text, text_rect)
 
-            text = font.render("Press R to restart or Q to Quit", True, WHITE)
+            text = font.render("Press R to restart or Q to Quit or M for Main Menu", True, WHITE)
             text_rect = text.get_rect(center=(windowWidth / 2, windowHeight / 2 + 50))
             window.blit(text, text_rect)
 
@@ -102,6 +102,9 @@ def gameLoop():
                     if event.key == pygame.K_r:
                         gameLoop()
                     if event.key == pygame.K_q:
+                        pygame.quit()
+                        quit()
+                    if event.key == pygame.K_m:                     
                         close = True
                         restart = False
             
@@ -219,6 +222,4 @@ def gameLoop():
         #set speed/framerate
         clock.tick(ticktime)
 
-    pygame.quit()
-    quit()
- 
+

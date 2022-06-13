@@ -50,17 +50,24 @@ def gameLoop():
     #spawn food at random location
     foodX = round(random.randrange(0, windowWidth - blocksize) / blocksize) * blocksize
     foodY = round(random.randrange(0, windowHeight - blocksize) / blocksize) * blocksize
-
+   
     while not close:
+        firstTime = True
         while restart == True:        
-            #Display postgame info
+            #Display postgame info     
+            # clear screen      
+            if firstTime:
+                window.fill(BLACK)    
+                pygame.display.update()
+                firstTime = False
+
             font = pygame.font.SysFont("comicsansms", 35)
 
             text = font.render("Your score: " + str(len(snakeList)) + "!", True, WHITE)
             text_rect = text.get_rect(center=(windowWidth / 2, windowHeight / 2 - 50))
             window.blit(text, text_rect)
 
-            text = font.render("Press R to restart or Q to Quit", True, WHITE)
+            text = font.render("Press R to restart or Q to Quit or M for Main Menu", True, WHITE)
             text_rect = text.get_rect(center=(windowWidth / 2, windowHeight / 2 + 50))
             window.blit(text, text_rect)
 
@@ -72,9 +79,13 @@ def gameLoop():
                     close = True
                     restart = False
                 if event.type == pygame.KEYDOWN:
+                    
                     if event.key == pygame.K_r:
                         gameLoop()
                     if event.key == pygame.K_q:
+                        pygame.quit()
+                        quit()
+                    if event.key == pygame.K_m:                     
                         close = True
                         restart = False
 
@@ -151,5 +162,4 @@ def gameLoop():
         #set speed/framerate
         clock.tick(ticktime)
 
-    pygame.quit()
-    quit()
+    
